@@ -12,6 +12,12 @@ let scoreHeader = document.getElementById('score-header')
 const width = 10
 const miniWidth = 4
 
+StartBtn.disabled = false
+moveDownButton.disabled = false
+rotateButton.disabled = false
+moveLeftButton.disabled = false
+moveRightButton.disabled = false
+
 //The Tetraminoes
 const lTetramino = [
     [1, width + 1, 2 * width + 1, 2 * width + 2],
@@ -89,6 +95,7 @@ const displayTetraminoes = [
     [miniWidth, miniWidth + 1, miniWidth + 2, miniWidth + 3]
 ]
 
+let shouldFreeze = false
 let score = 0
 displayScore.innerHTML = score
 let timeInterval = 500
@@ -134,22 +141,29 @@ function playScreenBorders() {
 }
 // Moves a tetris figure down every second
 function moveDown() {
+    freeze()
+    freeze2()
     undraw()
     currentPosition += width
     draw()
     gameOver()
-    freeze()
+
     removeComplitedRow()
 }
 // Freezes a tetris figure
 function freeze() {
-    let shouldFreeze = false
+    shouldFreeze = false
     for (eachSquare in currentTetramino) {
         if (squares[currentPosition + currentTetramino[eachSquare] + width].classList.contains('taken')) {
             shouldFreeze = true
-            clearInterval(fastRun)
         }
     }
+    if(shouldFreeze) {
+        clearInterval(fastRun)
+    }
+} 
+// Freezes a tetris figure and throws next one
+function freeze2() {
     if (shouldFreeze) {
         for (eachSquare in currentTetramino) {
         squares[currentPosition + currentTetramino[eachSquare]].classList.add('taken')
@@ -163,10 +177,11 @@ function freeze() {
         draw()
         displayNextFigure()
     } 
-}
+} 
+
 // Drops a tetris figure fast down
 function drop() {    
-    if (!(scoreHeader.innerHTML == 'Game over')) {
+    if (!(scoreHeader.innerHTML == 'Game over!')) {
         fastRun = setInterval(moveDown, 20)
         moveDownButton.disabled = true
         setTimeout(()=>{
@@ -287,17 +302,33 @@ function gameOver() {
     for (let i = 40; i < 50; i++) {
         if (squares[i].classList.contains('taken')) {
             clearInterval(runGame)
-            scoreHeader.innerHTML = 'Game over'
+            scoreHeader.innerHTML = 'Game over!'
+            StartBtn.disabled = true
+            moveDownButton.disabled = true
+            rotateButton.disabled = true
+            moveLeftButton.disabled = true
+            moveRightButton.disabled = true
         }
     }
 }
 // Pauses the game
 function gamePause() {
     if (runGame) {
+        clearInterval(fastRun) //pauses when a tetris figure is fast falling
         clearInterval(runGame)
         runGame = null
+        StartBtn.innerHTML = 'Unpause'
+        moveDownButton.disabled = true
+        rotateButton.disabled = true
+        moveLeftButton.disabled = true
+        moveRightButton.disabled = true
     } else {
         runGame = setInterval(moveDown, timeInterval)
+        StartBtn.innerHTML = 'Play/pause'
+        moveDownButton.disabled = false
+        rotateButton.disabled = false
+        moveLeftButton.disabled = false
+        moveRightButton.disabled = false
     }    
 }
 // Displays next tetris figure
