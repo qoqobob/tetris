@@ -145,9 +145,9 @@ function moveDown() {
     freeze2()
     undraw()
     currentPosition += width
+    checkBeforeRotate()
     draw()
     gameOver()
-
     removeComplitedRow()
 }
 // Freezes a tetris figure
@@ -245,19 +245,35 @@ function rotate() {
         randomRotation = 0
     }
     currentTetramino = tetraminoes[random][randomRotation]
+    //prevents a tetris figure to cross left and right screen border
     let rotatedTetramino = [(currentPosition + currentTetramino[0]) % 10, (currentPosition +currentTetramino[1]) % 10, (currentPosition +currentTetramino[2]) % 10, (currentPosition +currentTetramino[3]) % 10]
     while (rotatedTetramino.includes(0) && rotatedTetramino.includes(9)) {
         if (currentPosition % 10 === 8 || currentPosition % 10 === 7) {
-            undraw()
+            // undraw()
             currentPosition -=1
         }
         if (currentPosition % 10 === 9) {
-            undraw()
+            // undraw()
             currentPosition +=1
         }
         rotatedTetramino = [(currentPosition + currentTetramino[0]) % 10, (currentPosition +currentTetramino[1]) % 10, (currentPosition +currentTetramino[2]) % 10, (currentPosition +currentTetramino[3]) % 10]
     }
     draw()
+}
+// Prevents rotation a tetris figure if it overlaps freezed figures
+function checkBeforeRotate() {
+    rotateButton.disabled = false
+    let checkRotation = randomRotation + 1
+    if (checkRotation === 4) {
+        checkRotation = 0
+    }
+    let checkTetramino = tetraminoes[random][checkRotation]
+    for (eachSquare in checkTetramino) {
+        let index = currentPosition + checkTetramino[eachSquare]
+        if (squares[index].classList.contains('taken')) {
+            rotateButton.disabled = true
+        }
+    }
 }
 // Removes completed row and updates the score
 function removeComplitedRow() {
