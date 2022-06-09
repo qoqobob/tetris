@@ -112,17 +112,13 @@ fastRun = null
 // Draws a tetis random figure
 function draw() {
     for (eachSquare in currentTetramino) {
-        if (currentPosition + currentTetramino[eachSquare] >= 0) {
-            squares[currentPosition + currentTetramino[eachSquare]].classList.add(`tetramino${random}`)
-        }
+        squares[currentPosition + currentTetramino[eachSquare]].classList.add(`tetramino${random}`)
     }
 }
 // Deletes a tetris figure
 function undraw() {
     for (eachSquare in currentTetramino) {
-        if (currentPosition + currentTetramino[eachSquare] >= 0) {
-            squares[currentPosition + currentTetramino[eachSquare]].classList.remove(`tetramino${random}`)
-        }
+        squares[currentPosition + currentTetramino[eachSquare]].classList.remove(`tetramino${random}`)
     }
 }
 // Sets borders of the play screen 
@@ -141,17 +137,17 @@ function playScreenBorders() {
 }
 // Moves a tetris figure down every second
 function moveDown() {
+    checkIfFreeze()
     freeze()
-    freeze2()
     undraw()
     currentPosition += width
-    checkBeforeRotate()
+    rotateButton.disabled = false
     draw()
     gameOver()
     removeComplitedRow()
 }
-// Freezes a tetris figure
-function freeze() {
+// Checks if under a tetris figure are already frosen tetris figures
+function checkIfFreeze() {
     shouldFreeze = false
     for (eachSquare in currentTetramino) {
         if (squares[currentPosition + currentTetramino[eachSquare] + width].classList.contains('taken')) {
@@ -163,7 +159,7 @@ function freeze() {
     }
 } 
 // Freezes a tetris figure and throws next one
-function freeze2() {
+function freeze() {
     if (shouldFreeze) {
         for (eachSquare in currentTetramino) {
         squares[currentPosition + currentTetramino[eachSquare]].classList.add('taken')
@@ -178,7 +174,6 @@ function freeze2() {
         displayNextFigure()
     } 
 } 
-
 // Drops a tetris figure fast down
 function drop() {    
     if (!(scoreHeader.innerHTML == 'Game over!')) {
@@ -239,43 +234,41 @@ function moveRight() {
 }
 // Rotates a tetris figure clockwise
 function rotate() {
-    undraw()
-    randomRotation += 1
-    if (randomRotation === 4) {
-        randomRotation = 0
-    }
-    currentTetramino = tetraminoes[random][randomRotation]
-    //prevents a tetris figure to cross left and right screen border
-    let rotatedTetramino = [(currentPosition + currentTetramino[0]) % 10, (currentPosition +currentTetramino[1]) % 10, (currentPosition +currentTetramino[2]) % 10, (currentPosition +currentTetramino[3]) % 10]
-    while (rotatedTetramino.includes(0) && rotatedTetramino.includes(9)) {
-        if (currentPosition % 10 === 8 || currentPosition % 10 === 7) {
-            // undraw()
-            currentPosition -=1
-        }
-        if (currentPosition % 10 === 9) {
-            // undraw()
-            currentPosition +=1
-        }
-        rotatedTetramino = [(currentPosition + currentTetramino[0]) % 10, (currentPosition +currentTetramino[1]) % 10, (currentPosition +currentTetramino[2]) % 10, (currentPosition +currentTetramino[3]) % 10]
-    }
-    draw()
-}
-// Prevents rotation a tetris figure if it overlaps freezed figures
-function checkBeforeRotate() {
     rotateButton.disabled = false
     let checkRotation = randomRotation + 1
     if (checkRotation === 4) {
         checkRotation = 0
     }
+    let checkPosition = currentPosition
     let checkTetramino = tetraminoes[random][checkRotation]
+    //Checks if a tetris figure after it would rotate, would it cross left or right play screen border, if so then a figure position is shifted right or left
+    let rotatedTetramino = [(checkPosition + checkTetramino[0]) % 10, (checkPosition +checkTetramino[1]) % 10, (checkPosition +checkTetramino[2]) % 10, (checkPosition +checkTetramino[3]) % 10]
+    while (rotatedTetramino.includes(0) && rotatedTetramino.includes(9)) {
+        if (checkPosition % 10 === 8 || checkPosition % 10 === 7) {
+            checkPosition -=1
+        }
+        if (checkPosition % 10 === 9) {
+            checkPosition +=1
+        } 
+        rotatedTetramino = [(checkPosition + checkTetramino[0]) % 10, (checkPosition +checkTetramino[1]) % 10, (checkPosition +checkTetramino[2]) % 10, (checkPosition +checkTetramino[3]) % 10]
+    }
+    //Check if a tetris figure after it would rotate, would it overlape with a frosen tetis figures, if so than rotate button is disabled
     for (eachSquare in checkTetramino) {
-        let index = currentPosition + checkTetramino[eachSquare]
+        let index = checkPosition + checkTetramino[eachSquare]
         if (squares[index].classList.contains('taken')) {
             rotateButton.disabled = true
         }
     }
+    // Draws a rotated tetris figure on updated position, if above checks allow
+    if (!rotateButton.disabled) {
+        undraw()
+        randomRotation = checkRotation
+        currentPosition = checkPosition
+        currentTetramino = tetraminoes[random][randomRotation]
+        draw()
+    }
 }
-// Removes completed row and updates the score
+// Removes a fully completed row and updates the score
 function removeComplitedRow() {
     for (let j = 40; j <= 230; j+=10) {
         let isRowCompleted = true
