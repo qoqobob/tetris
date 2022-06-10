@@ -11,6 +11,7 @@ let displayScore = document.getElementById('score')
 let scoreHeader = document.getElementById('score-header')
 const width = 10
 const miniWidth = 4
+let blinkRows = []
 
 StartBtn.disabled = false
 moveDownButton.disabled = false
@@ -140,11 +141,13 @@ function moveDown() {
     checkIfFreeze()
     freeze()
     undraw()
+    removeCompletedRow()
     currentPosition += width
     rotateButton.disabled = false
     draw()
     gameOver()
-    removeComplitedRow()
+    // removeCompletedRow()
+    blinkCompletedRow()
 }
 // Checks if under a tetris figure are already frosen tetris figures
 function checkIfFreeze() {
@@ -168,6 +171,7 @@ function freeze() {
         currentPosition = 4
         random = nextRandom
         nextRandom = Math.floor(Math.random() * displayTetraminoes.length)
+        // nextRandom = 9
         randomRotation = Math.floor(Math.random() * tetraminoes[random].length)
         currentTetramino = tetraminoes[random][randomRotation]
         draw()
@@ -268,49 +272,111 @@ function rotate() {
         draw()
     }
 }
-// Removes a fully completed row and updates the score
-function removeComplitedRow() {
+function blinkCompletedRow() {
     for (let j = 40; j <= 230; j+=10) {
         let isRowCompleted = true
         for (let i = 0; i < 10; i++) {
             if (!squares[j + i].classList.contains('taken')) {
-                isRowCompleted = false
+                isRowCompleted = false                
             }
         }
         if (isRowCompleted) {
-            for (i = 0; i < 10; i++) {
-                squares[j + i].classList.remove('taken')                
-                squares[j + i].classList.remove('tetramino0')
-                squares[j + i].classList.remove('tetramino1')
-                squares[j + i].classList.remove('tetramino2')
-                squares[j + i].classList.remove('tetramino3')
-                squares[j + i].classList.remove('tetramino4')
-                squares[j + i].classList.remove('tetramino5')
-                squares[j + i].classList.remove('tetramino6')
-                squares[j + i].classList.remove('tetramino7')
-                squares[j + i].classList.remove('tetramino8')
-                squares[j + i].classList.remove('tetramino9')
-                squares[30 + i].classList.remove('hidden')
+            blinkRows.push(j) 
+            for (let i = j; i < 10 + j; i++) {
+                squares[i].classList.add('blinking')
             }
-
-            let removedRow = squares.splice(j, width)   
-            squares = removedRow.concat(squares)            
-            for (square in squares) {
-                grid.appendChild(squares[square])
-            }
-            for (i = 0; i < 10; i++) {
-                squares[i].classList.add('hidden')                
-            }
-            score += 10
-            displayScore.innerHTML = score
         }
     }
+    if (blinkRows.length > 0) {
+        let x = blinkRows.length
+        displayScore.classList.remove('score0')
+        displayScore.classList.add(`score${x}`)
+        displayScore.innerHTML = '+' + Math.floor(0.4167*x*x*x*x - 1.6667*x*x*x + 4.5833*x*x + 6.6667*x +0.1)     
+    }
 }
+// Removes a fully completed row and updates the score
+function removeCompletedRow() {
+    for (index in blinkRows) {
+        for (i = 0; i < 10; i++) {
+            squares[blinkRows[index] + i].classList.remove('blinking')
+            squares[blinkRows[index] + i].classList.remove('taken')                
+            squares[blinkRows[index] + i].classList.remove('tetramino0')
+            squares[blinkRows[index] + i].classList.remove('tetramino1')
+            squares[blinkRows[index] + i].classList.remove('tetramino2')
+            squares[blinkRows[index] + i].classList.remove('tetramino3')
+            squares[blinkRows[index] + i].classList.remove('tetramino4')
+            squares[blinkRows[index] + i].classList.remove('tetramino5')
+            squares[blinkRows[index] + i].classList.remove('tetramino6')
+            squares[blinkRows[index] + i].classList.remove('tetramino7')
+            squares[blinkRows[index] + i].classList.remove('tetramino8')
+            squares[blinkRows[index] + i].classList.remove('tetramino9')
+            squares[30 + i].classList.remove('hidden')
+        }
+        let removedRow = squares.splice(blinkRows[index], width)   
+        squares = removedRow.concat(squares)            
+        for (square in squares) {
+            grid.appendChild(squares[square])
+        }
+        for (i = 0; i < 10; i++) {
+            squares[i].classList.add('hidden')                
+        }
+        // score += 10
+        displayScore.innerHTML = score
+    }
+    let x = 0
+    if (blinkRows.length > 0) {
+        x = blinkRows.length
+        score += Math.floor(0.4167*x*x*x*x - 1.6667*x*x*x + 4.5833*x*x + 6.6667*x +0.1)
+        displayScore.classList.remove(`score${x}`)
+        displayScore.classList.add('score0')
+        displayScore.innerHTML = score
+    }
+    blinkRows = []
+}
+// // Removes a fully completed row and updates the score
+// function removeCompletedRow() {
+//     for (let j = 40; j <= 230; j+=10) {
+//         let isRowCompleted = true
+//         for (let i = 0; i < 10; i++) {
+//             if (!squares[j + i].classList.contains('taken')) {
+//                 isRowCompleted = false
+//             }
+//         }
+//         if (isRowCompleted) {
+//             for (i = 0; i < 10; i++) {
+//                 squares[j + i].classList.remove('taken')                
+//                 squares[j + i].classList.remove('tetramino0')
+//                 squares[j + i].classList.remove('tetramino1')
+//                 squares[j + i].classList.remove('tetramino2')
+//                 squares[j + i].classList.remove('tetramino3')
+//                 squares[j + i].classList.remove('tetramino4')
+//                 squares[j + i].classList.remove('tetramino5')
+//                 squares[j + i].classList.remove('tetramino6')
+//                 squares[j + i].classList.remove('tetramino7')
+//                 squares[j + i].classList.remove('tetramino8')
+//                 squares[j + i].classList.remove('tetramino9')
+//                 squares[30 + i].classList.remove('hidden')
+//             }
+
+//             let removedRow = squares.splice(j, width)   
+//             squares = removedRow.concat(squares)            
+//             for (square in squares) {
+//                 grid.appendChild(squares[square])
+//             }
+//             for (i = 0; i < 10; i++) {
+//                 squares[i].classList.add('hidden')                
+//             }
+//             score += 10
+//             displayScore.innerHTML = score
+//         }
+//     }
+// }
 // Stops the game
 function gameOver() {
     for (let i = 40; i < 50; i++) {
         if (squares[i].classList.contains('taken')) {
             clearInterval(runGame)
+            scoreHeader.classList.add('gameOver')
             scoreHeader.innerHTML = 'Game over!'
             StartBtn.disabled = true
             moveDownButton.disabled = true

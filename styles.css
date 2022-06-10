@@ -30,6 +30,7 @@ body {
     width: 84px;
     display: flex;
     flex-wrap: wrap;
+
 }
 .grid-mini div {
     width: 20px;
@@ -54,6 +55,15 @@ body {
 }
 h4 {
     margin-bottom: 0px;
+}
+h3 {
+    background-color: rgb(255, 255, 255);
+    width: 100%;
+    padding: 8px 5px;
+    border-radius: 10px;
+    color: rgb(25, 25, 25);
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+    text-align: center;
 }
 .button {
     border: none;
@@ -130,3 +140,28 @@ h4 {
 .hidden {
     display: none;
 }
+@keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+}
+.blinking {
+    animation: blinker 0.15s linear infinite;
+}
+@keyframes blinkerScore {
+    50% {
+      opacity: 0;
+    }
+}
+.score0 {
+    color: rgb(25, 25, 25);
+}
+.score1, .score2, .score3, .score4 {
+    color: rgb(255, 0, 225);
+    font-weight: bold;
+}
+.gameOver {
+    color: orangered;
+    font-weight: bold;
+}
+
