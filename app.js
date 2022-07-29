@@ -441,5 +441,23 @@ rotateButton.addEventListener('dblclick', rotate)
 moveDownButton.addEventListener('dblclick', drop)
 StartBtn.addEventListener('dblclick', gamePause)
 
+document.addEventListener('keydown', function(e) {
+    if (e.key === "ArrowRight" && runGame != null) {
+        moveRight();
+    }
+    if (e.key === "ArrowLeft" && runGame != null) {
+        moveLeft();
+    }
+    if (e.key === "ArrowUp" && runGame != null) {
+        rotate();
+    }
+    if (e.key === "ArrowDown" && runGame != null) {
+        drop();
+    }
+    if (e.key === " ") {
+        gamePause();
+    }
+})
+
 runGame = setInterval(moveDown, timeInterval)
 })
